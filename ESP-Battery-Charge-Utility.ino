@@ -1,7 +1,7 @@
 /* ********************************************************************************************** */
 /*                                                                                                */
 /*   ESP Battery Charge Utility                                        :::::::::        :::       */
-/*   ESP_Battery_Charge_Utility.ino                                   :+:    :+:     :+: :+:      */
+/*   ESP-Battery-Charge-Utility.ino                                   :+:    :+:     :+: :+:      */
 /*                                                                   +:+    +:+    +:+   +:+      */
 /*   By: Roman Alexandrov <r.aleksandroff@gmail.com>                +#++:++#:    +#++:++#++:      */
 /*                                                                 +#+    +#+   +#+     +#+       */
@@ -73,7 +73,6 @@
 #include <string.h>
 #ifdef ESP32
   #include <driver/adc.h>
-  #include "esp_adc_cal.h"
   #include "WiFi.h"
 #else //ESP8266
   #include "ESP8266WiFi.h"
@@ -84,33 +83,35 @@
 
 uint32_t  battery;
 int       networks;
+int       time = 1000;
 
 void  setup(void)
 {
     Serial.begin(115200);
-    WiFi.mode(WIFI_STA);
-    WiFi.disconnect();
-    delay(500);
     #ifdef ESP32
         adc1_config_width(ADC_WIDTH_12Bit);
         adc1_config_channel_atten(ADC1_CHANNEL_0, ADC_ATTEN_11db);
     #endif
+    WiFi.mode(WIFI_STA);
+    WiFi.disconnect();
+    delay(500);
 }
 
 void  loop(void)
 {
+    #ifdef LOAD
+        networks = WiFi.scanNetworks();
+        Serial.printf("number of discovered networks: %d\n", networks);
+        WiFi.scanDelete();
+        time = 100;
+    #endif
+    delay(time);
     #ifdef ESP32
         battery = adc1_get_raw(ADC1_CHANNEL_0);
     #else //ESP8266
         battery = ESP.getVcc();
     #endif
-    #ifdef LOAD
-        networks = WiFi.scanNetworks();
-        Serial.printf("number of discovered networks: %d\n", networks);
-        WiFi.scanDelete();
-    #endif
-    Serial.println(battery);
-    delay(1000);  
+    Serial.println(battery);  
 }
 
  
