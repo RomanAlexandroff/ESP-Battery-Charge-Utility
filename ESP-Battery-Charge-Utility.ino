@@ -83,7 +83,7 @@
 
 uint32_t  battery;
 int       networks;
-int       time = 1000;
+uint32_t  for_this_long = 1000;
 
 void  setup(void)
 {
@@ -103,9 +103,9 @@ void  loop(void)
         networks = WiFi.scanNetworks();
         Serial.printf("number of discovered networks: %d\n", networks);
         WiFi.scanDelete();
-        time = 100;
+        for_this_long = 100;
     #endif
-    delay(time);
+    delay(for_this_long);
     #ifdef ESP32
         battery = adc1_get_raw(ADC1_CHANNEL_0);
     #else //ESP8266
